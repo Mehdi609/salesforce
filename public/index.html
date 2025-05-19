@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salesforce Data Entry</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .form-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        background-color: #0070d2;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #005fb2;
+      }
+      .message {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      .success {
+        background-color: #dff0d8;
+        color: #3c763d;
+      }
+      .error {
+        background-color: #f2dede;
+        color: #a94442;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h2>Salesforce Data Entry Form</h2>
+      <form id="salesforceForm">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="Name" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="Email__c" required />
+        </div>
+        <div class="form-group">
+          <label for="cohort">Cohort:</label>
+          <input type="text" id="cohort" name="Cohort__c" required />
+        </div>
+        <button type="submit">Submit to Salesforce</button>
+      </form>
+      <div id="message" class="message" style="display: none"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("salesforceForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = {
+            Name: document.getElementById("name").value,
+            Email__c: document.getElementById("email").value,
+            Cohort__c: document.getElementById("cohort").value,
+          };
+
+          const messageDiv = document.getElementById("message");
+
+          try {
+            const response = await fetch("/submit", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              messageDiv.className = "message success";
+              messageDiv.textContent =
+                "Data successfully submitted to Salesforce!";
+              document.getElementById("salesforceForm").reset();
+            } else {
+              throw new Error(result.message || "Failed to submit data");
+            }
+          } catch (error) {
+            messageDiv.className = "message error";
+            messageDiv.textContent = `Error: ${error.message}`;
+          }
+
+          messageDiv.style.display = "block";
+        });
+    </script>
+  </body>
+</html>
